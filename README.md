@@ -1,2 +1,14 @@
 # debian-dev-setup
-Setup up Debian for development - Kubernetes/Node.js/Docker/Terraform + more
+automate your Debian dev setup
+
+I strongly encourage forking!
+
+```
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/chobe/debian-dev-setup/master/setup.sh)"
+```
+
+# Development Setup
+
+The following tools will be installed/configured
+
+* git
