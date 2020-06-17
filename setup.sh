@@ -27,7 +27,6 @@ function configure_git(){
   git config --global user.email $git_email
   git config --global core.editor vim
   git config --global color.ui true
-  git config --global core.autocrlf true
   
   # View abbreviated SHA, description, and history graph of the latest 20 commits
 	git config --global alias.l "log --pretty=oneline -n 20 --graph --abbrev-commit"
@@ -65,19 +64,87 @@ Host github.com
     IdentityFile ~/.ssh/github
 EOF
   fi
+}
 
-  echo
+function configure_curl(){
+  echo_sleep "Configuring curl..."
+  
+  if [ ! -e ~/.curlrc ]; then
+    cat > ~/.curlrc <<EOF
+# Disguise as IE 9 on Windows 7.
+user-agent = "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)"
+
+# When following a redirect, automatically set the previous URL as referer.
+referer = ";auto"
+
+# Wait 60 seconds before timing out.
+connect-timeout = 60
+EOF
+  fi
+}
+
+function configure_vim(){
+  echo_sleep "Configuring vim..."
+  command -v vim >/dev/null 2>&1 || (update_system && sudo apt install vim -y)
+
+  cat > ~/.vimrc <<EOF
+" Turn on syntax highlighting.
+syntax on
+
+colorscheme desert
+
+" Show line numbers
+set number
+
+" Encoding
+set encoding=utf-8
+
+" Status bar
+set laststatus=2
+
+" Display different types of white spaces.
+set list
+set listchars=tab:›\ ,trail:•,extends:#,nbsp:.
+EOF
+}
+
+function configure_bash() {
+  cat > ~/.bash_aliases <<EOF
+#!/usr/bin/env bash
+
+# Easier navigation: .., ..., ...., ....., ~ and -
+alias ..="cd .."
+alias ...="cd ../.."
+alias ....="cd ../../.."
+alias .....="cd ../../../.."
+
+# Shortcuts
+alias d="cd ~/Descargas"
+alias p="cd ~/dev"
+
+alias ll='ls -l'
+alias la='ls -A'
+alias l='ls -CF'
+
+# Enable aliases to be sudo’ed
+alias sudo='sudo '
+EOF
+
+  source ~/.bash_aliases
 }
 
 PS3="Choose an option: "
-menu_options=("Configure All" "Configure git" "Quit")
+menu_options=("Configure All" "Configure git" "Configure Curl" "Configure Vim" "Configure Bash" "Quit")
 while true; do
-  echo "Let's configure your system"
+  echo -e "\nLet's configure your system"
   select opt in "${menu_options[@]}"; do
     case $REPLY in
-      1) check_update; break ;;
+      1) configure_git && configure_curl && configure_vim; break ;;
       2) configure_git; break ;;
-      3) break 2 ;;
+      3) configure_curl; break;;
+      4) configure_vim; break;;
+      5) configure_bash; break;;
+      6) break 2 ;;
       *)
         echo -e "\nInvalid option"
         read -rsn1 -p "Press any key to continue" >&2
